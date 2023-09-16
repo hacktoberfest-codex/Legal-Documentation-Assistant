@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Will Form</title>
+</head>
+<body>
+    <h1>Last Will and Testament</h1>
+    
+    <form  method="post">
+        <h2>Testator Information</h2>
+        <label for="testator_name">Full Name:</label>
+        <input type="text" id="testator_name" name="testator_name" required><br><br>
+
+        <label for="testator_address">Address:</label>
+        <input type="text" id="testator_address" name="testator_address" required><br><br>
+
+        <h2>Executor Information</h2>
+        <label for="executor_name">Full Name:</label>
+        <input type="text" id="executor_name" name="executor_name" required><br><br>
+
+        <label for="executor_address">Address:</label>
+        <input type="text" id="executor_address" name="executor_address" required><br><br>
+
+        <h2>Beneficiaries</h2>
+        <p>List the beneficiaries and their relationship to you:</p>
+        <textarea id="beneficiaries" name="beneficiaries" rows="4" cols="50" required></textarea><br><br>
+
+        <h2>Assets and Bequests</h2>
+        <p>Describe your assets and specify how you want them to be distributed:</p>
+        <textarea id="assets_and_bequests" name="assets_and_bequests" rows="4" cols="50" required></textarea><br><br>
+
+        <h2>Additional Instructions</h2>
+        <p>Include any additional instructions or wishes:</p>
+        <textarea id="additional_instructions" name="additional_instructions" rows="4" cols="50"></textarea><br><br>
+
+        <h2>Signature</h2>
+        <p>By submitting this form, I declare that this is my last will and testament, and I am of sound mind.</p>
+        <label for="testator_signature">Testator's Signature:</label>
+        <input type="text" id="testator_signature" name="testator_signature" required><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

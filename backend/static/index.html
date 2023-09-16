@@ -1,52 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-	</head>
-	<body>
-		<h1>Registration</h1>
-		<form id="reg-form">
-			<input type="text" autocomplete="off" id="username" placeholder="Username" />
-			<input type="email" autocomplete="off" id="email" placeholder="Email" />
-			<input type="password" autocomplete="off" id="password" placeholder="Password" />
-			<input type="password" autocomplete="off" id="conf_password" placeholder="Confirm Password" />
-			<input type="submit" value="Submit Form" />
-		</form>
+<html>
+<head>
+    <title>Will Form</title>
+</head>
+<body>
+    <h1> Will </h1>
+    
+    <form action="/submit_will" method="post">
+        <h2>Testator Information</h2>
+        <label for="author_name">Full Name:</label>
+        <input type="text" id="author_name" name="author_name" required><br><br>
 
-        <script>
-			const form = document.getElementById('reg-form')
-			form.addEventListener('submit', registerUser)
+        <label for="author_address">Address:</label>
+        <input type="text" id="author_address" name="author_address" required><br><br>
 
-			async function registerUser(event) {
-				event.preventDefault()
-				const username = document.getElementById('username').value
-				const email = document.getElementById('email').value
-				const password = document.getElementById('password').value
-				const conf_password = document.getElementById('conf_password').value
+        
 
-				const result = await fetch('/api/register', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-						
-					},
-					body: JSON.stringify({
-						username,
-						email,
-						password,
-						conf_password
-					})
-				}).then((res) => res.json())
-
-				if (result.status === 'ok') {
-					// everythign went fine
-					alert('Success')
-				} else {
-					alert(result.error)
-				}
-			}
-		</script>
-	</body>
+        <input type="submit" value="Submit">
+    </form>
+</body>
 </html>
