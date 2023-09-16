@@ -4,7 +4,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { useState } from "react";
-export default function page() {
+export default function SignUp() {
   const [loading, setLodaing] = useState(false);
 
   const [errors, setErrors] = useState({});
