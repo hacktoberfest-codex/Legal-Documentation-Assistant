@@ -13,6 +13,8 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "lucide-react": "^0.277.0",
@@ -21,6 +23,9 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.11.0",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^2.1.4",
+    "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3"
   }
 }
