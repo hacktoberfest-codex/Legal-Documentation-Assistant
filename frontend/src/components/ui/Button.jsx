@@ -17,11 +17,11 @@ const buttonVariants = cva(
           "bg-transparent hover:bg-neutral-100 data-[state=open]:bg-transparent",
         link: "bg-transparent underline-offset-4hover:underline text-neutral-700 hover:text-neutral-800",
       },
-        // const css = 'mx-3 sm:mx-4';
+      // const css = 'mx-3 sm:mx-4';
       size: {
         default: "p-[0.375rem] md:p-2 md:rounded-lg",
-        xs: 'h-7 px-2 rounded text-sm',
-        sm: "h-9 px-2 rounded-md",
+        xs: "h-7 px-2 rounded text-sm",
+        sm: "py-3 px-7 md:px-8 rounded-md",
         lg: "py-4 md:py-5 px-7 md:px-8 rounded-2xl md:rounded-2xl",
         none: "",
       },

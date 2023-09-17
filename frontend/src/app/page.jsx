@@ -20,7 +20,7 @@ export default function Home() {
             />
             <h1 className="text-3xl font-semibold">Welcome to LegallyFit</h1>
           </div>
-          <p className="">
+          <p className="pt-2">
             Your AI-Powered Legal Companion for Simplified Documentation in
             Bharat
           </p>

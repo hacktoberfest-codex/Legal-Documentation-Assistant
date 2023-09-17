@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { useState } from "react";
 export default function SignUp() {
-  const [loading, setLodaing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
   const [values, setValues] = useState({
@@ -35,6 +35,7 @@ export default function SignUp() {
         placeholder="Username"
         name="username"
         value={values.username}
+        className="border-black"
         // error={errors.username ? true : false}
         onChange={onChange}
       />
@@ -43,16 +44,23 @@ export default function SignUp() {
         placeholder="Email"
         name="email"
         value={values.email}
+        className="border-black"
         // error={errors.password ? true : false}
         onChange={onChange}
       />
-      <Input type="password" placeholder="Password" name="password" />
+      <Input
+        type="password"
+        placeholder="Password"
+        className="border-black"
+        name="password"
+      />
       <Input
         type="password"
         placeholder="Confirm Password"
         name="confirmPassword"
+        className="border-black"
       />
-      <Button className="bg-[#8ECDDD]">Sign Up</Button>
+      <Button className="bg-[#8ECDDD] hover:bg-[#8ECDDD]/70">Sign Up</Button>
       <small>
         Already Registered?{" "}
         <Link href="/signin" className="text-[#22668D]">
