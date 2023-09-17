@@ -9,7 +9,8 @@ const cors = require('cors');
 
 const {login, register}  = require('./resolvers/users.js');
 const {checkAuth} = require('./util/auth-validator.js');
-const {getPrompt} = require('./components/GPT/getPrompt.js');
+const {getCaseDetails} = require ('./components/caseDetails/getCaseDetails.js');
+const {getLandingPrompt} = require('./components/GPT/getPrompt.js');
 const {affidavit} = require('./components/forms/affidavit.js');
 const {nda} = require('./components/forms/nda.js');
 const {will} = require('./components/forms/will.js');
@@ -98,18 +99,41 @@ app.get('/api/user', async (req, res) => {
 	}
 });
 
-app.post('/api/generate-prompt', async (req, res) => {
-	
+app.post('/api/generate-prompt', async (req, res) => {	
 	const user = await checkAuth(req, res);
 	if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 	
 	const {prompt} = req.body;
 
-	const output = await getPrompt(prompt);
-	res.json({status: 'ok', data: output});	
+	try {
+		const initial_prompt = await getLandingPrompt(prompt, req, res);
+	
+		const output = await getCaseDetails(prompt);
+
+		res.json(JSON.parse(initial_prompt));	
+	} catch (e) {
+		console.log(e);
+		res.json({status: 'error', error: 'Something went wrong'});
+	}
 });
 
-app.post('api/submit_will', async (req, res) => {
+app.post('/api/case-details', async (req, res) => {
+	const user = await checkAuth(req, res);
+	if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
+	
+	const {prompt} = req.body;
+	
+	try {
+		const output = await getCaseDetails(prompt);
+		res.json({status: 'ok', data: output});
+	} catch (e) {
+		console.log(e);
+		res.json({status: 'error', error: 'Something went wrong'});
+	}
+});
+
+
+app.post('api/submit-will', async (req, res) => {
     // Access form data from req.body
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
@@ -117,14 +141,62 @@ app.post('api/submit_will', async (req, res) => {
      
      
 });
-app.post('api/submit_affidavit', async (req, res) => {
+app.post('api/submit-affidavit', async (req, res) => {
     const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 	const affedevit = await affidavit(req,res);
      
 });
-app.post('api/submit_nda', async (req, res) => {
+
+app.post('api/submit-nda', async (req, res) => {
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 	const nda = await affidavit(req,res); 
+});
+
+app.get("/api/load", async(req, res) => {
+	const str = `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>My HTML Document</title>
+	</head>
+	<body>
+		<header>
+			<h1>Welcome to My HTML Document</h1>
+		</header>
+	
+		<nav>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">About</a></li>
+				<li><a href="#">Contact</a></li>
+			</ul>
+		</nav>
+	
+		<main>
+			<section>
+				<h2>About Us</h2>
+				<p>This is a simple HTML document.</p>
+			</section>
+	
+			<section>
+				<h2>Contact Information</h2>
+				<address>
+					Email: <a href="mailto:info@example.com">info@example.com</a><br>
+					Phone: +123-456-7890
+				</address>
+			</section>
+		</main>
+	
+		<footer>
+			<p>&copy; 2023 My HTML Document</p>
+		</footer>
+	</body>
+	</html>
+	`;
+	
+
+	res.send(str);
 });
