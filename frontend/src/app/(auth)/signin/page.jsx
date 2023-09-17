@@ -4,28 +4,46 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 export default function SignIn() {
-    const [loading, setLoading] = useState(false);
 
-    const [errors, setErrors] = useState({});
     const [values, setValues] = useState({
       username: "",
       password: "",
     });
 
+    const router = useRouter();
     const onChange = (event) => {
       setValues({ ...values, [event.target.name]: event.target.value });
     };
 
-    const onSubmit = (event) => {
-    //   event.preventDefault();
+    const loginHandler = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const response = await res.json();
+        if (!response) return console.log("error");
+        if(response) {
+          const {data} = response;
+          router.push("/");
+          console.log("success");
+          localStorage.setItem('token', data)
+        }
+        
+      } catch (error) {
+        return console.log();(error);
+      }
     };
   return (
     <form
-      onSubmit={onSubmit}
-      className={`${
-        loading ? "loading" : ""
-      } w-96 grid gap-6 text-center border border-black p-8 rounded-3xl`}
+      onSubmit={loginHandler}
+      className={`w-96 grid gap-6 text-center border border-black p-8 rounded-3xl`}
     >
       <h3 className="text-3xl font-semibold text-[#22668D]">Sign In</h3>
       <Input
@@ -46,7 +64,7 @@ export default function SignIn() {
         // error={errors.password ? true : false}
         onChange={onChange}
       />
-      <Button className="bg-[#8ECDDD] hover:bg-[#8ECDDD]/70">Sign In</Button>
+      <Button type="submit" className="bg-[#8ECDDD] hover:bg-[#8ECDDD]/70">Sign In</Button>
       <small>
         New User?{" "}
         <Link href="/signup" className="text-[#22668D]">
