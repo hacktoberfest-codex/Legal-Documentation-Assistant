@@ -1,34 +1,47 @@
+const { getAffidavitPrompt } = require("../GPT/getPrompt");
 
 async function affidavit(req, res) {
 	const authorName = req.body.author_name;
-	const authorAge= req.body.author_Age;
+	const authorAge= req.body.author_age;
 	const matter = req.body.matter;
-	const date= req.body.date;
-	const month = req.body.month;
-	const year = req.body.year;
     const officialIdNo= req.body.officialId;
-}
+    const gender = req.body.gender;
+    const address = req.body.address;
+    const post = req.body.post;
+    const district = req.body.district;
+    const state = req.body.state;
+    const country = req.body.country;
 
-module.exports = {affidavit};
+
+    var Months = ['January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December'];
+    
+    var currentDay = new Date();
+    var date = currentDay.getDate();
+    var month = Months[currentDay.getMonth()];
+    var year = currentDay.getFullYear();
 
 const header = `AFFIDAVIT`;
 const court = ``;
 const user = {
-    name: ``,
-    age: 0,
-    gender: '',
-    address: ``,
-    post: ``,
-    district: ``,
-    state: ``,
-    country: ``
+    name: authorName,
+    age: authorAge,
+    gender: gender,
+    address: address,
+    post: post,
+    district: district,
+    state: state,
+    country: country
 }
+
+
 //purpose refactored
-const purpose = ``;
+var purpose = await getAffidavitPrompt(matter, req, res);
 const timePlace = {
-    date: ``,
-    month: ``,
-    year: ``,
+    date: date,
+    month: month,
+    year: year,
 }
 const magistrateName = ``;
 const legalID = {
@@ -51,6 +64,9 @@ if (legalID.voter) {
     legalStatement += `${j}. Voter ID Card No. : ${legalID.voter}\n`;
     j++;
 }
+
+purpose = purpose.replace('[user.name]', user.name);
+
 const para = [
     court
     ,
@@ -76,3 +92,10 @@ const para = [
     ,
     legalStatement
 ]
+
+console.log(para);
+return para;
+
+}
+
+module.exports = {affidavit};

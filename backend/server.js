@@ -17,6 +17,7 @@ const {will} = require('./components/forms/will.js');
 
 
 
+
 const JWT_SECRET = process.env.SECRET_KEY;
 
 const app = express();
@@ -153,14 +154,27 @@ app.post('/api/submit-will', async (req, res) => {
 app.post('/api/submit-affidavit', async (req, res) => {
     const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
-	const affedevit = await affidavit(req,res);
+
+	try {
+		const affidavit_data = await affidavit(req, res);
+		res.json({status: 'ok', data: affidavit_data});
+	}
+	catch(e) {
+		console.log(e);
+	}
      
 });
 
 app.post('/api/submit-nda', async (req, res) => {
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
-	const nda = await affidavit(req,res); 
+	try {
+		const nda_data = await nda(req, res);
+		res.json({status: 'ok', data: nda_data});
+	}
+	catch(e) {
+		console.log(e);
+	} 
 });
 
 

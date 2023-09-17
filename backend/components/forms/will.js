@@ -20,6 +20,17 @@ async function will(personData, req, res) {
     const header = 'WILL'
     // Handling form data
 
+
+    
+    var Months = ['January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December'];
+    
+    var currentDay = new Date();
+    var date = currentDay.getDate();
+    var month = Months[currentDay.getMonth()];
+    var year = currentDay.getFullYear();
+
     const user = {
         name: authorName,
         age: authorAge,
@@ -124,9 +135,9 @@ async function will(personData, req, res) {
     // benefitStatement = benefitStatement.replace("${benefeiciary.name}", beneficiary[0].name);
 
     const timePlace = {
-        date: '12',
-        month: 'September',
-        year: '2021',
+        date: date,
+        month: month,
+        year: year,
     }
 
     const para = [

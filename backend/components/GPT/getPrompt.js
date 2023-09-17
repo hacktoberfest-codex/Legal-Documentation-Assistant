@@ -128,7 +128,72 @@ async function getWillPrompt(beneficiary, prompt, req, res, allBenefits) {
   return result;
 };
 
-// console.log("Logging from gpt", beneficiary);
-// return beneficiary;
+async function getAffidavitPrompt(purpose, req, res) {
+  const prompt = `I am drafting a legal Affidavit. My purpose to make this affidavit is given in the statement below 
+                statment = ${purpose}}. Your job is to generate legal jargons for the given statement and put it all in one paragraph.
+                If you are generating names, use [user.name] as a parameter. Your sentences should all be complete and must follow all grammatical rules.`;
+  try {
+    // console.log("Working on current ben: ", ben.benefits);
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: 1000,
+        temperature: 0.75,
+        n: 1,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      }
+    );
+    // console.log(allBenefits);
+    var result = response.data.choices[0].text.trim();
 
-module.exports = { getLandingPrompt, getWillPrompt };
+    console.log(`Logging Results: `, result);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  // console.log("Logging from gpt", result);
+  return result;
+
+}
+
+async function getNDAPrompt(purpose, req, res) {
+  const prompt = `I am drafting a legal non-disclosure agreement. My purpose to make this NDA is given in the statement below 
+                statment = ${purpose}}. Your job is to generate legal jargons for the given statement and put it all in one paragraph.
+                If you generate a disclosure name then use [disclosureName] as a placeholder and if you are using receiver name then use [receiverName] as a placeholder,Your sentences should all be complete and must follow all grammatical rules.`;
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: 1000,
+        temperature: 0.75,
+        n: 1,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      }
+    );
+    // console.log(allBenefits);
+    var result = response.data.choices[0].text.trim();
+
+    console.log(`Logging Results: `, result);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  return result;
+
+}
+
+module.exports = { getLandingPrompt, getWillPrompt, getAffidavitPrompt, getNDAPrompt };
