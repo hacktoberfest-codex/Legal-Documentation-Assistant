@@ -106,7 +106,7 @@ app.post('/api/generate-prompt', async (req, res) => {
 	const {prompt} = req.body;
 
 	try {
-		const initial_prompt = await getLandingPrompt(prompt);
+		const initial_prompt = await getLandingPrompt(prompt, req, res);
 	
 		const output = await getCaseDetails(prompt);
 
@@ -147,8 +147,56 @@ app.post('api/submit-affidavit', async (req, res) => {
 	const affedevit = await affidavit(req,res);
      
 });
+
 app.post('api/submit-nda', async (req, res) => {
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 	const nda = await affidavit(req,res); 
+});
+
+app.get("/api/load", async(req, res) => {
+	const str = `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>My HTML Document</title>
+	</head>
+	<body>
+		<header>
+			<h1>Welcome to My HTML Document</h1>
+		</header>
+	
+		<nav>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">About</a></li>
+				<li><a href="#">Contact</a></li>
+			</ul>
+		</nav>
+	
+		<main>
+			<section>
+				<h2>About Us</h2>
+				<p>This is a simple HTML document.</p>
+			</section>
+	
+			<section>
+				<h2>Contact Information</h2>
+				<address>
+					Email: <a href="mailto:info@example.com">info@example.com</a><br>
+					Phone: +123-456-7890
+				</address>
+			</section>
+		</main>
+	
+		<footer>
+			<p>&copy; 2023 My HTML Document</p>
+		</footer>
+	</body>
+	</html>
+	`;
+	
+
+	res.send(str);
 });

@@ -14,7 +14,14 @@ const userSchema = new Schema({
     post: {
         type: Schema.Types.ObjectId,
         ref: 'posts'
-    }
+    },
+    history: [
+        {
+            summary: String,
+            createdAt: String,
+            genDoc: String
+        }
+    ]
 });
 
 module.exports = model('User', userSchema);
