@@ -16,7 +16,6 @@ const { getLandingPrompt } = require('./components/GPT/getPrompt.js');
 const { affidavit } = require('./components/forms/affidavit.js');
 const { nda } = require('./components/forms/nda.js');
 const { will } = require('./components/forms/will.js');
-const { download } = require('./components/download/pdf.js')
 
 
 const JWT_SECRET = process.env.SECRET_KEY;
@@ -203,15 +202,7 @@ app.get("/api/load", async (req, res) => {
 	res.send(str);
 });
 
-// app.get('api/download-pdf', async (req, res) => {
  
-// 	const pdfBuffer = await generatePDF(html);
-  
-// 	res.setHeader('Content-Type', 'application/pdf');
-// 	res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
-// 	res.send(pdfBuffer);
-//   });
-
 
 async function generatePDF(html) {
   const browser = await puppeteer.launch();
@@ -232,8 +223,8 @@ async function generateWord(html) {
 }
 
 // API request to download PDF
-app.get('api/download-pdf', async (req, res) => {
-  const html = ;
+app.get('/download-pdf', async (req, res) => {
+  const html ='<h1>HTML page here</h1>' ;
   const pdfBuffer = await generatePDF(html);
 
   res.setHeader('Content-Type', 'application/pdf');
@@ -242,8 +233,8 @@ app.get('api/download-pdf', async (req, res) => {
 });
 
 // API request to download Word
-app.get('api/download-word', async (req, res) => {
-  const html = ;
+app.get('/download-word', async (req, res) => {
+  const html ='<h1>HTML page here</h1>' ;
   const wordBuffer = await generateWord(html);
 
   res.setHeader('Content-Type', 'application/msword');
