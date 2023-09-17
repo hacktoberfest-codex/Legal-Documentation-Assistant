@@ -105,6 +105,7 @@ app.post('/api/generate-prompt', async (req, res) => {
 	if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 	
 	const {prompt} = req.body;
+	console.log(prompt);
 
 	try {
 		const initial_prompt = await getLandingPrompt(prompt, req, res);
