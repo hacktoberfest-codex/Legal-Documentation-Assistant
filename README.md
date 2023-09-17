@@ -27,3 +27,10 @@ Plus, with our login feature, you can easily store and view your history with us
 ## Challenges
   
 Determining the type of legal document a user is asking for is a challenging task, even for experienced lawyers. We trained an AWS Comprehend Sentiment Analysis model to tackle this challenge, but it struggled to achieve the desired level of accuracy. ChatGPT, a cutting-edge AI language model, outperformed our AWS Comprehend model by a significant margin and demonstrated an uncanny ability to decipher even the most ambiguous requests.
+
+## Variables involved
+
+ 1. PORT
+ 2. MONGO_URI
+ 3. SECRET_KEY
+ 4. OPENAI_API_KEY
