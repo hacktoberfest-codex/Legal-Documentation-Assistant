@@ -17,6 +17,7 @@ const userSchema = new Schema({
     },
     history: [
         {
+            prompt: String,
             summary: String,
             createdAt: String,
             genDoc: String
