@@ -46,7 +46,7 @@ async function getLandingPrompt(scenario, req, res) {
     
     console.log("Log", summary);
     try{
-      await savePrompt(summary, req, res);
+      await savePrompt(scenario, summary, req, res);
     } catch(e) {
       console.log(e);
     }
@@ -58,14 +58,15 @@ async function getLandingPrompt(scenario, req, res) {
   }
 }
 
-async function savePrompt(prompt, req, res) {
+async function savePrompt(actualPrompt, promptSummary, req, res) {
   const user = await checkAuth(req, res);
 	if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
 
   console.log(user);
 
   const newHistory = {
-    summary: prompt,
+    prompt: actualPrompt,
+    summary: promptSummary,
     createdAt: new Date().toISOString()
   }
 
@@ -86,4 +87,48 @@ async function savePrompt(prompt, req, res) {
   }
 }
 
-module.exports = {getLandingPrompt};
+async function getWillPrompt(beneficiary, prompt, req, res, allBenefits) {
+  
+    // console.log("Fetching ben: ", ben.benefits);
+    // const myPrompt = `I am formulating a will document. Rephrase this statement using legal jargon. Your response must be limited to 70 words. 
+    //                   Sentence = "` + ben.benefits + `"`;
+
+
+    const nyPrompt = `I am formulating a will document. Rephrase this statement using legal jargon. Make sure not to make any changes to "to [beneficiary.name], residing at [beneficiary.address]"
+    Your response must be limited to 70 words per statement. For context use each of the following statements in the list as a single unique prompt for different beneficiaries and generate a string concating all the statements divided by a dollar sign.:
+   sentences="` + allBenefits + `"`;
+
+   try {
+      // console.log("Working on current ben: ", ben.benefits);
+      const response = await axios.post(
+        'https://api.openai.com/v1/completions',
+        {
+          model: "text-davinci-003",
+          prompt: nyPrompt,
+          max_tokens: 1000,
+          temperature: 0.5,
+          n: 1,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+          }
+        }
+      );
+      // console.log(allBenefits);
+      var result = response.data.choices[0].text.trim();
+      
+      console.log(`Logging Results: `, result);
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    return result;
+  };
+
+
+  // console.log("Logging from gpt", beneficiary);
+  // return beneficiary;
+
+module.exports = {getLandingPrompt, getWillPrompt};

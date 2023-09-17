@@ -1,32 +1,89 @@
-async function will(req, res) {
+const {User} = require('../../model/User');
+const {checkAuth} = require('../../util/auth-validator.js')
+const {getWillPrompt} = require('../GPT/getPrompt.js');
+
+async function will(personData, req, res) {
 	const authorName = req.body.author_name;
     const authorAddress = req.body.author_address;
-	const witnessName= req.body.witness_name;
-	const witnessAddress= req.body.witness_address;
-	const executorName= req.body.executorName;
-	const beneficiaryName= req.body.beneficiaryName;
+    const authorAge = req.body.author_age;
+    const district = req.body.district;
+    const state = req.body.state;
+    const country = req.body.country;
+	const witness= req.body.witness; // array of objects
+	const executor = req.body.executor; // array of objects
+	var beneficiary = req.body.beneficiary; //
 	const propertyDetails= req.body.propertyDetails;
 	const nominationOfLegalChild = req.body.legalChildName;
 	const desire = req.body.desire;
-}
+    const prompt = req.body.prompt;
 
 const header = 'WILL'
+// Handling form data
+
 const user = {
-    name: 'aparesh',
-    age: 22,
-    address: 'machili bazar, Kolkata, India'
+    name: authorName,
+    age: authorAge,
+    address: authorAddress,
+    district: district,
+    state: state,
+    country: country
 }
-const witness = [
-    //atleast one witness
-    {
-        name: 'soumya',
-        address: 'bhubaneswar, India'
-    },
-    {
-        name: 'tushar',
-        address: 'haryana, India'
+
+//     beneficiary = [
+//     {
+//         name: 'ben1',
+//         address: 'ben1 address',
+//         benefits: `i give my 80% of my property`,
+//     },
+//     {
+//         name: 'ben2',
+//         address: 'ben2 address',
+//         benefits: `i give my 20% of my property`,
+//     }
+// ]
+
+
+
+
+
+
+
+const allBenefits=[];
+for(let i=0;i<beneficiary.length; i++){
+    allBenefits.push(`I give my ${beneficiary[i].benefits} to [beneficiary${i}.name], residing at [beneficiary${i}.address]`);
+}
+
+let temp = await getWillPrompt(beneficiary, prompt, req, res, allBenefits);
+beneficiary=temp.split("$")
+console.log("Logging from will", beneficiary);
+
+let benefitStatement = '';
+if (beneficiary.length == 1) {
+    // allBenefits.push(beneficiary[0].benefits);
+    benefitStatement = beneficiary[0].replace(`[beneficiary0.name]`, beneficiary[0].name);
+    benefitStatement = beneficiary[0].replace(`[beneficiary0.address]`, beneficiary[0].address);
+}
+else {
+    for (let i = 0; i < beneficiary.length; i++) {
+        let temp=beneficiary[i]
+        temp= temp.replace(`[beneficiary${i}.name]`, beneficiary[i].name);
+        temp=temp.replace(`[beneficiary${i}.address]`, beneficiary[i].address);
+        benefitStatement += `${i + 1}. ${temp} \n`
     }
-]
+}
+
+
+// const witness = [
+//     //atleast one witness
+//     {
+//         name: 'soumya',
+//         address: 'bhubaneswar, India'
+//     },
+//     {
+//         name: 'tushar',
+//         address: 'haryana, India'
+//     }
+// ]
 let witnessStatement = '';
 if (witness.length == 1) {
     witnessStatement = `\n\n${witness[0].name}\n${witness[0].address}.\n`
@@ -35,50 +92,43 @@ if (witness.length == 1) {
         witnessStatement += `\n\n${i + 1}. ${witness[i].name}\n${witness[i].address}.\n`
     }
 }
-const executor = [
-    //1-2 executor
-    {
-        name: 'ex1',
-        address: 'ex1 address'
-    },
-    {
-        name: 'ex2',
-        address: 'ex2 address'
-    }
-]
-const beneficiary = [
-    //atleast 1 beneficiary
-    //benefits refactored
-    {
-        name: 'ben1',
-        address: 'ben1 address',
-        benefits: `i give my 80% of my property`,
-    },
-    {
-        name: 'ben2',
-        address: 'ben2 address',
-        benefits: `i give my 20% of my property`,
-    }
-]
-let benefitStatement = '';
-if (beneficiary.length == 1) {
-    benefitStatement = `I give my ${beneficiary[0].benefits} to ${beneficiary[0].name}, residing at ${beneficiary[0].address}.`;
-}
-else {
-    for (let i = 0; i < beneficiary.length; i++) {
-        benefitStatement += `${i + 1}. I give my ${beneficiary[i].benefits} to ${beneficiary[i].name}, residing at ${beneficiary[i].address}.\n`
-    }
-}
+// const executor = [
+//     //1-2 executor
+//     {
+//         name: 'ex1',
+//         address: 'ex1 address'
+//     },
+//     {
+//         name: 'ex2',
+//         address: 'ex2 address'
+//     }
+// ]
+// const beneficiary = [
+//     //atleast 1 beneficiary
+//     //benefits refactored
+//     {
+//         name: 'ben1',
+//         address: 'ben1 address',
+//         benefits: `i give my 80% of my property`,
+//     },
+//     {
+//         name: 'ben2',
+//         address: 'ben2 address',
+//         benefits: `i give my 20% of my property`,
+//     }
+// ]
+
+
+// benefitStatement = benefitStatement.replace("${benefeiciary.name}", beneficiary[0].name);
 
 const timePlace = {
     date: '12',
     month: 'September',
     year: '2021',
-    place: 'Kolkata'
 }
 
 const para = [
-    `I, ${user.name}, aged ${user.age}, residing at ${user.address}, being of sound mind and in full control of my faculties, do hereby make, publish, and declare this to be my Last Will and Testament, revoking all previous wills and codicils made by me.`
+    `I, ${user.name}, aged ${user.age}, residing at ${user.address}, ${user.district}, ${user.state}, ${user.country}, being of sound mind and in full control of my faculties, do hereby make, publish, and declare this to be my Last Will and Testament, revoking all previous wills and codicils made by me.`
     ,
     `I maintain good health, and possess a sound mind. This Will is made by me of my own independent decision and free volition. Have not be influenced, cajoled or coerced in any manner whatsoever.`
     ,
@@ -90,7 +140,7 @@ const para = [
     ,
     `All the assets owned by me are self-acquired properties. No one else has any right, title, interest, claim or demand whatsoever on these assets or properties. I have full right, absolute power and complete authority on these assets, or in any other property which may be substituted in their place or places which may be Acquired or received by me hereafter.`
     ,
-    `This shall be governed by and construed in accordance with the constitution of India.\nIN WITNESS WHEREOF, I have hereunto set my hand and seal this ${timePlace.date} of ${timePlace.month}, ${timePlace.month}, at ${timePlace.place}.`
+    `This shall be governed by and construed in accordance with the constitution of India.\nIN WITNESS WHEREOF, I have hereunto set my hand and seal this ${timePlace.date} of ${timePlace.month}, ${timePlace.month}, at ${user.district}.`
     ,
     `\n\nSignature\n`
     ,
@@ -98,6 +148,12 @@ const para = [
     ,
     witnessStatement
 ]
+
+    // console.log(beneficiary);
+    return para;
+
+}
+
 
 
 module.exports = {will};
