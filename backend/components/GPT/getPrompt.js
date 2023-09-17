@@ -1,6 +1,6 @@
 const axios = require('axios');
 const User = require('../../model/User');
-const {checkAuth} = require('../../util/auth-validator')
+const { checkAuth } = require('../../util/auth-validator')
 
 const landingPrompt = `You will now behave as GPT model which has extensive knowledge on Indian Judiciary and every keyword related to the Indian Penal Code (IPC). I am providing you with a scenario, your job is to search and find IPC Articles and section that can be applied in the given scenario. Your response should be in the form of JSON with the following structure. 
 
@@ -43,11 +43,11 @@ async function getLandingPrompt(scenario, req, res) {
     console.log("Logging Result: ", result);
 
     const summary = JSON.parse(result).shortPrompt;
-    
+
     console.log("Log", summary);
-    try{
-      await savePrompt(summary, req, res);
-    } catch(e) {
+    try {
+      await savePrompt(scenario, summary, req, res);
+    } catch (e) {
       console.log(e);
     }
 
@@ -58,14 +58,15 @@ async function getLandingPrompt(scenario, req, res) {
   }
 }
 
-async function savePrompt(prompt, req, res) {
+async function savePrompt(actualPrompt, promptSummary, req, res) {
   const user = await checkAuth(req, res);
-	if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
+  if (!user) return res.status(401).json({ status: 'error', error: 'Unauthenticated' });
 
   console.log(user);
 
   const newHistory = {
-    summary: prompt,
+    prompt: actualPrompt,
+    summary: promptSummary,
     createdAt: new Date().toISOString()
   }
 
@@ -82,8 +83,117 @@ async function savePrompt(prompt, req, res) {
     return updatedUser;
   } catch (e) {
     console.error("Couldn't save the history: ", e);
-    throw e; 
+    throw e;
   }
 }
 
-module.exports = {getLandingPrompt};
+async function getWillPrompt(beneficiary, prompt, req, res, allBenefits) {
+
+  // console.log("Fetching ben: ", ben.benefits);
+  // const myPrompt = `I am formulating a will document. Rephrase this statement using legal jargon. Your response must be limited to 70 words. 
+  //                   Sentence = "` + ben.benefits + `"`;
+
+
+  const nyPrompt = `I am formulating a will document. Rephrase this statement using legal jargon. Make sure not to make any changes to "to [beneficiary.name], residing at [beneficiary.address]"
+    Your response must be limited to 70 words per statement. For context use each of the following statements in the list as a single unique prompt for different beneficiaries and generate a string concating all the statements divided by a dollar sign.:
+   sentences="` + allBenefits + `"`;
+
+  try {
+    // console.log("Working on current ben: ", ben.benefits);
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: "text-davinci-003",
+        prompt: nyPrompt,
+        max_tokens: 1000,
+        temperature: 0.5,
+        n: 1,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      }
+    );
+    // console.log(allBenefits);
+    var result = response.data.choices[0].text.trim();
+
+    console.log(`Logging Results: `, result);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  // console.log("Logging from gpt", result);
+  return result;
+};
+
+async function getAffidavitPrompt(purpose, req, res) {
+  const prompt = `I am drafting a legal Affidavit. My purpose to make this affidavit is given in the statement below 
+                statment = ${purpose}}. Your job is to generate legal jargons for the given statement and put it all in one paragraph.
+                If you are generating names, use [user.name] as a parameter. Your sentences should all be complete and must follow all grammatical rules.`;
+  try {
+    // console.log("Working on current ben: ", ben.benefits);
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: 1000,
+        temperature: 0.75,
+        n: 1,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      }
+    );
+    // console.log(allBenefits);
+    var result = response.data.choices[0].text.trim();
+
+    console.log(`Logging Results: `, result);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  // console.log("Logging from gpt", result);
+  return result;
+
+}
+
+async function getNDAPrompt(purpose, req, res) {
+  const prompt = `I am drafting a legal non-disclosure agreement. My purpose to make this NDA is given in the statement below 
+                statment = ${purpose}}. Your job is to generate legal jargons for the given statement and put it all in one paragraph.
+                If you generate a disclosure name then use [disclosureName] as a placeholder and if you are using receiver name then use [receiverName] as a placeholder,Your sentences should all be complete and must follow all grammatical rules.`;
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        model: "text-davinci-003",
+        prompt: prompt,
+        max_tokens: 1000,
+        temperature: 0.75,
+        n: 1,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        }
+      }
+    );
+    // console.log(allBenefits);
+    var result = response.data.choices[0].text.trim();
+
+    console.log(`Logging Results: `, result);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  return result;
+
+}
+
+module.exports = { getLandingPrompt, getWillPrompt, getAffidavitPrompt, getNDAPrompt };

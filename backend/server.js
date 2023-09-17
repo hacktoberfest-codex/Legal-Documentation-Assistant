@@ -17,6 +17,7 @@ const {will} = require('./components/forms/will.js');
 
 
 
+
 const JWT_SECRET = process.env.SECRET_KEY;
 
 const app = express();
@@ -108,7 +109,7 @@ app.post('/api/generate-prompt', async (req, res) => {
 	try {
 		const initial_prompt = await getLandingPrompt(prompt, req, res);
 	
-		const output = await getCaseDetails(prompt);
+		// const output = await getCaseDetails(prompt);
 
 		res.json(JSON.parse(initial_prompt));	
 	} catch (e) {
@@ -133,26 +134,67 @@ app.post('/api/case-details', async (req, res) => {
 });
 
 
-app.post('api/submit-will', async (req, res) => {
+app.post('/api/submit-will', async (req, res) => {
     // Access form data from req.body
+
+	//NOTE: Store the prompt in req.body.prompt, so that we can pass it as a parameter
+	// to the will function
+
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
-	const will = await affidavit(req,res);
-     
+	
+	try {
+		const will_data = await will(user, req, res);
+		res.json({status: 'ok', data: will_data});
+	} catch(e) {
+		console.log(e);
+	}
      
 });
-app.post('api/submit-affidavit', async (req, res) => {
+app.post('/api/submit-affidavit', async (req, res) => {
     const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
-	const affedevit = await affidavit(req,res);
+
+	try {
+		const affidavit_data = await affidavit(req, res);
+		res.json({status: 'ok', data: affidavit_data});
+	}
+	catch(e) {
+		console.log(e);
+	}
      
 });
 
-app.post('api/submit-nda', async (req, res) => {
+app.post('/api/submit-nda', async (req, res) => {
 	const user = await checkAuth(req, res);
     if(!user) return res.status(401).json({status: 'error', error: 'Unauthenticated'});
-	const nda = await affidavit(req,res); 
+	try {
+		const nda_data = await nda(req, res);
+		res.json({status: 'ok', data: nda_data});
+	}
+	catch(e) {
+		console.log(e);
+	} 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get("/api/load", async(req, res) => {
 	const str = `<!DOCTYPE html>
